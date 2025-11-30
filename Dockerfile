@@ -9,16 +9,15 @@ COPY tsconfig.json ./
 RUN npm ci
 
 COPY . .
-RUN npm run build
+ARG RUN_BUILD=false
+RUN if [ "$RUN_BUILD" = "true" ]; then npm run build; else echo "Skipping build (RUN_BUILD != true)"; fi
 
 FROM node:18-alpine AS runner
 WORKDIR /app
 RUN apk add --no-cache dumb-init
 RUN addgroup -g 1001 -S nodejs && adduser -S -u 1001 nodejs -G nodejs
 
-COPY --from=builder /app/package*.json ./
-COPY --from=builder /app/build ./build
-COPY --from=builder /app/.adonisrc.json ./.adonisrc.json
+COPY --from=builder /app /app
 
 RUN npm ci --only=production && npm cache clean --force
 
