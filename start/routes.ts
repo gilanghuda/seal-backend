@@ -20,6 +20,7 @@
 
 import Route from '@ioc:Adonis/Core/Route'
 import './routes/AuthRoutes'
+import './routes/ChatRoutes'
 
 Route.get('/', async () => {
   return { hello: 'world' }

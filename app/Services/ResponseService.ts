@@ -34,7 +34,6 @@ export default class ResponseService {
   public badRequest(message: string, errors: Record<string, string[]>) {
     return this.response.badRequest(this.buildResponse(false, message, undefined, errors))
   }
-
   public unauthorized(message: string) {
     return this.response.unauthorized(this.buildResponse(false, message))
   }

@@ -21,6 +21,8 @@ export default class MessagesSchema extends BaseSchema {
 
       table.text('message').notNullable()
 
+      table.jsonb('suggest_links').nullable()
+
       table.timestamp('created_at', { useTz: true }).defaultTo(this.now())
       table.timestamp('updated_at', { useTz: true }).defaultTo(this.now())
 

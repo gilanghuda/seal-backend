@@ -14,7 +14,7 @@ export default class AuthService {
     try {
       return await this.userRepository.create(payload)
     } catch (error) {
-      console.error('Registration error:', error)
+
       throw error
     }
   }
@@ -44,7 +44,6 @@ export default class AuthService {
         token: token.token,
       }
     } catch (error) {
-      console.error('Login error:', error)
       throw error
     }
   }
@@ -53,7 +52,6 @@ export default class AuthService {
     try {
       await ctx.auth.use('api').revoke()
     } catch (error) {
-      console.error('Logout error:', error)
       throw error
     }
   }
