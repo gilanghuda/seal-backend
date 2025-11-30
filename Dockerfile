@@ -8,7 +8,7 @@ COPY package*.json ./
 COPY tsconfig.json ./
 RUN npm ci
 
-COPY . 
+COPY . .
 RUN npm run build
 
 FROM node:18-alpine AS runner
