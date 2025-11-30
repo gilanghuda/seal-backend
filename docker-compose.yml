@@ -44,7 +44,7 @@ services:
     volumes:
       - ./:/app
       - /app/node_modules
-      - ./.env:/.env   # mount your local .env into container for dev (optional)
+      - ./.env:/.env   
     command: npm run dev
 
 volumes:
