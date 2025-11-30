@@ -1,0 +1,51 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: seal-be-postgres
+    environment:
+      POSTGRES_USER: ${PG_USER:-postgres}
+      POSTGRES_PASSWORD: ${PG_PASSWORD:-postgres}
+      POSTGRES_DB: ${PG_DB_NAME:-sealdb}
+    ports:
+      - "${PG_PORT:-5432}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${PG_USER:-postgres}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: seal-be:latest
+    container_name: seal-be-app
+    environment:
+      NODE_ENV: ${NODE_ENV:-development}
+      PORT: ${PORT:-3333}
+      HOST: ${HOST:-0.0.0.0}
+      APP_KEY: ${APP_KEY}
+      DRIVE_DISK: ${DRIVE_DISK:-local}
+      DB_CONNECTION: ${DB_CONNECTION:-pg}
+      PG_HOST: postgres
+      PG_PORT: ${PG_PORT:-5432}
+      PG_USER: ${PG_USER:-postgres}
+      PG_PASSWORD: ${PG_PASSWORD:-postgres}
+      PG_DB_NAME: ${PG_DB_NAME:-sealdb}
+    ports:
+      - "${PORT:-3333}:3333"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ./:/app
+      - /app/node_modules
+      - ./.env:/.env   # mount your local .env into container for dev (optional)
+    command: npm run dev
+
+volumes:
+  postgres_data:
