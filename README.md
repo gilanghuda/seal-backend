@@ -1,9 +1,7 @@
-# Seal Backend — Dokumentasi Lengkap
-
 Links penting
-- Production (try API here): 
-- Swagger / API Docs: 
-  - (Contoh: coba API di  atau buka dokumentasi interaktif di )
+- Production (try API here): https://seal.gilanghuda.my.id/
+- Swagger / API Docs: https://seal.gilanghuda.my.id/docs
+  - (Contoh: coba API di https://seal.gilanghuda.my.id/  atau buka dokumentasi interaktif di https://seal.gilanghuda.my.id/docs  )
 
 Ringkasan singkat
 - Nama: Seal Backend
