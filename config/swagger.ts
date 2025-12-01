@@ -48,5 +48,6 @@ export default {
 		],
 		basePath: '/'
 	},
-	mode: 'RUNTIME',
+	mode: 'PRODUCTION',
+  specFilePath: 'docs/swagger.json'
 } as SwaggerConfig
