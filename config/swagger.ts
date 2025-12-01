@@ -18,7 +18,7 @@ export default {
 			},
 			servers: [
 				{
-					url: 'http://localhost:3333',
+					url: 'https://seal.gilanghuda.my.id',
 					description: 'Development server',
 				},
 			],
