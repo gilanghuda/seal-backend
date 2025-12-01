@@ -19,7 +19,7 @@ export default {
 			servers: [
 				{
 					url: 'https://seal.gilanghuda.my.id',
-					description: 'Development server',
+					description: 'Production server',
 				},
 			],
 			components: {

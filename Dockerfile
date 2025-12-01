@@ -25,6 +25,7 @@ COPY --from=builder /app/package*.json ./
 COPY --from=builder /app/ace ./ace
 COPY --from=builder /app/.adonisrc.json .adonisrc.json
 COPY --from=builder /app/docs ./docs
+COPY --from=builder /app/docs ./public/docs
 
 EXPOSE 3333
 
