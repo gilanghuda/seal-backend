@@ -22,7 +22,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    image: seal-be:latest
+    image: gilanghuda/seal-be-app:latest
     container_name: seal-be-app
     environment:
       NODE_ENV: ${NODE_ENV:-development}
@@ -40,12 +40,8 @@ services:
       - "${PORT:-3333}:3333"
     depends_on:
       postgres:
-        condition: service_healthy
-    volumes:
-      - ./:/app
-      - /app/node_modules
-      - ./.env:/.env   
-    command: npm run dev
+        condition: service_healthy 
+    command: node build/server.js
 
 volumes:
   postgres_data:

@@ -1,10 +1,11 @@
 import { SwaggerConfig } from '@ioc:Adonis/Addons/Swagger'
 
 export default {
+	specFilePath: 'docs/swagger.json',
 	uiEnabled: true, //disable or enable swaggerUi route
-	uiUrl: '/docs', 
+	uiUrl: 'docs', // url path to swaggerUI
 	specEnabled: true, //disable or enable swagger.json route
-	specUrl: '/docs/swagger.json', 
+	specUrl: '/swagger.json',
 
 	middleware: [], // middlewares array, for protect your swagger docs and spec endpoints
 
@@ -18,8 +19,8 @@ export default {
 			},
 			servers: [
 				{
-					url: 'https://seal.gilanghuda.my.id',
-					description: 'Production server',
+					url: 'http://localhost:3333',
+					description: 'Development server',
 				},
 			],
 			components: {
@@ -48,6 +49,6 @@ export default {
 		],
 		basePath: '/'
 	},
-	mode: 'PRODUCTION',
-  specFilePath: 'docs/swagger.json'
+	mode: 'RUNTIME',
+
 } as SwaggerConfig

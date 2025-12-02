@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "node ace serve --watch",
     "build": "node ace build --production  --ignore-ts-errors",
+    "postbuild": "mkdir -p public/docs && node ace swagger:generate",
     "start": "node server.js",
     "test": "node ace test"
   },
@@ -32,6 +33,7 @@
     "proxy-addr": "^2.0.7",
     "reflect-metadata": "^0.2.2",
     "source-map-support": "^0.5.21",
+    "swagger-ui-dist": "^5.30.3",
     "uuid": "^13.0.0"
   }
 }

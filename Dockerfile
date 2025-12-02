@@ -24,11 +24,15 @@ COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/package*.json ./
 COPY --from=builder /app/ace ./ace
 COPY --from=builder /app/.adonisrc.json .adonisrc.json
-COPY --from=builder /app/public/docs ./public/docs
-COPY --from=builder /app/entrypoint.sh ./entrypoint.sh
-RUN chmod +x ./entrypoint.sh
+
+COPY --from=builder /app/app ./app
+COPY --from=builder /app/start ./start
+COPY --from=builder /app/docs ./docs
+COPY --from=builder /app/config ./config
+COPY --from=builder /app/contracts ./contracts
+COPY --from=builder /app/public ./public
 
 EXPOSE 3333
 
-ENTRYPOINT ["dumb-init", "--", "/app/entrypoint.sh"]
+ENTRYPOINT ["dumb-init", "--"]
 CMD ["node", "build/server.js"]

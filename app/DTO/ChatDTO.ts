@@ -1,5 +1,5 @@
 export interface SendQuestionRequestDTO {
-  conversation_id?: string // Optional, will create new conversation if not provided
+  conversation_id?: string
   question: string
 }
 

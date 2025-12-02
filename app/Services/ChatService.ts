@@ -172,9 +172,6 @@ export default class ChatService {
     }
   }
 
-  /**
-   * Get conversation messages with cursor-based pagination
-   */
   public async getConversationMessages(
     conversationId: string,
     userId: string,
@@ -231,9 +228,6 @@ export default class ChatService {
     }
   }
 
-  /**
-   * Get user conversations with cursor-based pagination
-   */
   public async getUserConversations(
     userId: string,
     limit: number = 10,
@@ -273,9 +267,7 @@ export default class ChatService {
     }
   }
 
-  /**
-   * Delete conversation with authorization check
-   */
+
   public async deleteConversation(conversationId: string, userId: string): Promise<boolean> {
     try {
       Logger.debug({ conversationId, userId }, '[SERVICE] Deleting conversation')

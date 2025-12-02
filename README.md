@@ -1,161 +1,176 @@
-Links penting
-- Production (try API here): https://seal.gilanghuda.my.id/
-- Swagger / API Docs: https://seal.gilanghuda.my.id/docs
-  - (Contoh: coba API di https://seal.gilanghuda.my.id/  atau buka dokumentasi interaktif di https://seal.gilanghuda.my.id/docs  )
+# Seal Backend
 
 Ringkasan singkat
 - Nama: Seal Backend
 - Framework: AdonisJS (TypeScript)
-- Base URL (lokal): http://localhost:3333
+- Base URL (lokal): `http://localhost:3333`
+- Prod URL : `https://seal.gilanghuda.my.id`
 - Semua endpoint API diawali dengan prefix `/api`
-- Otentikasi: Bearer token (header `Authorization: Bearer <token>`)
+- Dokumentasi interaktif (Swagger UI): `https://seal.gilanghuda.my.id/docs` (production) atau `http://localhost:3333/docs` (lokal)
+- Spec Swagger JSON: `/swagger.json`
+- Otentikasi: Bearer token (`Authorization: Bearer <token>`)
 
-Persyaratan
+Quick Links
+- Production: https://seal.gilanghuda.my.id/
+- Swagger / API Docs: https://seal.gilanghuda.my.id/docs
+
+Requirements
 - Node.js >= 16
-- PostgreSQL (atau DB yang dikonfigurasi)
-- Yarn atau npm
-- .env terisi sesuai contoh di bawah
+- PostgreSQL (atau DB sesuai config)
+- npm atau yarn
+- File `.env` terisi
 
-Contoh .env
-- Buat file .env di root proyek. Contoh variabel:
-  APP_KEY=your_app_key_here
-  NODE_ENV=development
-  PORT=3333
-  DB_CONNECTION=pg
-  PG_HOST=127.0.0.1
-  PG_PORT=5432
-  PG_USER=postgres
-  PG_PASSWORD=secret
-  PG_DB_NAME=seal_db
+Contoh .env (minimal)
+```
+APP_KEY=your_app_key_here
+NODE_ENV=development
+PORT=3333
+DB_CONNECTION=pg
+PG_HOST=127.0.0.1
+PG_PORT=5432
+PG_USER=postgres
+PG_PASSWORD=secret
+PG_DB_NAME=seal_db
+```
 
-Instalasi & Jalankan secara lokal
-1. Clone repo dan masuk ke folder:
+Instalasi & Jalankan (lokal)
+1. Clone repo
    - git clone <repo>
    - cd /home/gilanghuda/coding/seal-backend
-2. Install dependencies:
-   - npm install
-   - atau yarn
-3. Siapkan .env sesuai contoh di atas
-4. Jalankan migrasi database:
-   - node ace migration:run
-   (Jika menggunakan seed: node ace db:seed --files=...)
-5. Jalankan server development:
-   - npm run dev
-   - Akses: http://localhost:3333
+2. Install dependencies
+   - `npm install` atau `yarn`
+3. Siapkan `.env`
+4. Jalankan migrasi
+   - `node ace migration:run`
+5. Jalankan server development
+   - `npm run dev`
+   - Akses: `http://localhost:3333`
 
-Build & Start production
-- npm run build
-- npm start
-- Pastikan environment variabel production sudah di-set.
+Build & Start (production)
+- `npm run build`
+- `npm start`
 
-Testing
-- npm run test
+Docker
+- Dockerfile sudah menyalin folder `docs`, sehingga Swagger UI dan `swagger.json` akan tersedia di image production jika ada.
 
-Autentikasi
-- Sistem menggunakan token Bearer. Dapatkan token lewat endpoint /api/auth/login.
-- Sertakan header: Authorization: Bearer <token>
+Konfigurasi Swagger
+- Tidak ada perubahan tambahan yang diperlukan di `config/swagger.ts`. Konfigurasi saat ini sudah mengaktifkan UI dan spec (pastikan file `docs/swagger.json` ada apabila ingin menampilkan spec di production).
 
-API Endpoints 
+Endpoint Summary (ringkas)
+| Method | Path | Auth | Deskripsi |
+|---:|---|---:|---|
+| POST | /api/auth/register | No | Registrasi user baru |
+| POST | /api/auth/login | No | Login -> return token |
+| POST | /api/auth/logout | Yes | Logout (butuh token) |
+| GET  | /api/auth/me | Yes | Ambil profil user saat ini |
+| POST | /api/chat/questions | Yes | Kirim pertanyaan ke chatbot (buat percakapan baru jika tidak ada conversation_id) |
+| GET  | /api/chat/conversations | Yes | Daftar percakapan user (cursor-based pagination) |
+| GET  | /api/chat/conversations/:conversationId | Yes | Detail percakapan + pesan (messages pagination) |
+| DELETE | /api/chat/conversations/:conversationId | Yes | Hapus percakapan & semua pesan (owner saja) |
 
-1) Auth
-- POST /api/auth/register
-  - Deskripsi: Registrasi user baru
-  - Body JSON:
-    {
-      "username":"johndoe",
-      "email":"john@example.com",
-      "password":"password123"
-    }
-  - Contoh curl:
-    curl -X POST http://localhost:3333/api/auth/register \
-      -H "Content-Type: application/json" \
-      -d '{"username":"johndoe","email":"john@example.com","password":"password123"}'
-  - Response: 201 (user created) atau 400 (validation)
+Contoh Request (curl)
+- Register
+```
+curl -X POST http://localhost:3333/api/auth/register \
+  -H "Content-Type: application/json" \
+  -d '{"username":"johndoe","email":"john@example.com","password":"password123"}'
+```
+- Login
+```
+curl -X POST http://localhost:3333/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email":"john@example.com","password":"password123"}'
+```
+- Kirim pertanyaan ke chatbot
+```
+curl -X POST http://localhost:3333/api/chat/questions \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer <token>" \
+  -d '{"question":"Apa itu pajak daerah?"}'
+```
+- Ambil list percakapan (pagination)
+```
+curl "http://localhost:3333/api/chat/conversations?limit=10" \
+  -H "Authorization: Bearer <token>"
+```
 
-- POST /api/auth/login
-  - Deskripsi: Login, kembalikan token
-  - Body JSON:
-    { "email":"john@example.com", "password":"password123" }
-  - Contoh:
-    curl -X POST http://localhost:3333/api/auth/login \
-      -H "Content-Type: application/json" \
-      -d '{"email":"john@example.com","password":"password123"}'
-  - Response: 200, { success, message, data: { token, user } }
-
-- POST /api/auth/logout
-  - Deskripsi: Logout (memerlukan Authorization header)
-  - Contoh:
-    curl -X POST http://localhost:3333/api/auth/logout \
-      -H "Authorization: Bearer <token>"
-
-- GET /api/auth/me
-  - Deskripsi: Ambil profil user saat ini
-  - Contoh:
-    curl -X GET http://localhost:3333/api/auth/me \
-      -H "Authorization: Bearer <token>"
-
-2) Chat (prefix: /api/chat, perlu auth)
-- POST /api/chat/questions
-  - Deskripsi: Kirim pertanyaan ke chatbot. Jika `conversation_id` kosong, server buat percakapan baru. Memanggil API eksternal (Majadigi) dan menyimpan balasan.
-  - Body JSON:
-    {
-      "question": "Apa itu pajak daerah?",
-      "conversation_id": "optional-uuid"
-    }
-  - Contoh curl:
-    curl -X POST http://localhost:3333/api/chat/questions \
-      -H "Content-Type: application/json" \
-      -H "Authorization: Bearer <token>" \
-      -d '{"question":"Apa itu pajak daerah?"}'
-  - Response: 200, data: { conversation, user_message, bot_message }
-
-- GET /api/chat/conversations
-  - Deskripsi: Daftar percakapan user (cursor-based pagination)
-  - Query params:
-    - cursor (base64 id) — kosong untuk halaman pertama
-    - limit (integer, default 10, max 100)
-  - Contoh:
-    curl "http://localhost:3333/api/chat/conversations?limit=10" \
-      -H "Authorization: Bearer <token>"
-  - Response: 200, { conversations: [...], pagination: { next_cursor, has_more, limit }, meta: {...} }
-
-- GET /api/chat/conversations/:conversationId
-  - Deskripsi: Detail percakapan + pesan (messages pagination)
-  - Query params:
-    - messages_cursor (base64 message id)
-    - messages_limit (default 20)
-  - Contoh:
-    curl "http://localhost:3333/api/chat/conversations/CONV_UUID?messages_limit=20" \
-      -H "Authorization: Bearer <token>"
-  - Response: 200, { conversation, messages: [...], pagination: {...} }
-
-- DELETE /api/chat/conversations/:conversationId
-  - Deskripsi: Hapus percakapan & semua pesan (hanya owner)
-  - Contoh:
-    curl -X DELETE http://localhost:3333/api/chat/conversations/CONV_UUID \
-      -H "Authorization: Bearer <token>"
-
-Detail format response (contoh singkat)
+Format Response (contoh singkat)
 - Conversation item:
-  {
-    "id": "uuid",
-    "session_id": "string",
-    "last_message": "string|null",
-    "created_at": "datetime",
-    "updated_at": "datetime"
-  }
-
+```
+{
+  "id": "uuid",
+  "session_id": "string",
+  "last_message": "string|null",
+  "created_at": "datetime",
+  "updated_at": "datetime"
+}
+```
 - Message item:
+```
+{
+  "id": "uuid",
+  "sender_type": "user|bot",
+  "message": "string",
+  "suggest_links": [ { "title":"", "link":"" } ] | null,
+  "created_at": "datetime"
+}
+```
+
+Cursor-based Pagination (penjelasan lengkap)
+- Konsep singkat:
+  - Cursor pagination menggunakan "pointer" (cursor) yang merepresentasikan posisi di dataset (biasanya base64-encoded ID).
+  - Untuk halaman pertama, jangan sertakan `cursor`. Server mengembalikan data plus `pagination.next_cursor` jika masih ada halaman berikutnya.
+  - Klien menggunakan `next_cursor` sebagai `cursor` pada request berikutnya untuk mengambil halaman selanjutnya.
+
+- Mengapa base64?
+  - Meng-encapsulate ID (atau kombinasi ID+timestamp) membuat cursor aman dan tidak langsung menampilkan internal ID.
+  - Contoh encoding/decoding (pseudocode):
+    - Encode: btoa(id)  (browser/JS) → menyiapkan cursor untuk query selanjutnya
+    - Decode: atob(cursor)  (browser/JS) → dapatkan id asli (biasanya tidak perlu di-klien)
+
+- Contoh alur:
+  1. Request pertama (halaman pertama):
+     curl "http://localhost:3333/api/chat/conversations?limit=10" -H "Authorization: Bearer <token>"
+  2. Response misal mengandung:
+     {
+       "data": { "conversations": [ ... 10 items ... ], "pagination": { "next_cursor": "NjMwZWMwNzIt...", "has_more": true, "limit": 10 } }
+     }
+  3. Request selanjutnya:
+     curl "http://localhost:3333/api/chat/conversations?limit=10&cursor=NjMwZWMwNzIt..." -H "Authorization: Bearer <token>"
+
+- Contoh response (singkat):
   {
-    "id": "uuid",
-    "sender_type": "user|bot",
-    "message": "string",
-    "suggest_links": [ { "title":"", "link":"" } ] | null,
-    "created_at": "datetime"
+    "success": true,
+    "data": {
+      "conversations": [ /* items sorted desc by created_at or last_message */ ],
+      "pagination": {
+        "next_cursor": "NjMwZWMwNzItY2U4YS00MDEyLWFmMzUtOTAxZTcxMWE1MzUy",
+        "has_more": true,
+        "limit": 10
+      }
+    }
   }
 
-Penjelasan Cursor Pagination 
-- Cursor adalah base64 dari ID (biasanya ID terakhir dari halaman sebelumnya).
-- Untuk mendapatkan halaman pertama: omit cursor
-- Jika response mengandung pagination.next_cursor -> gunakan itu sebagai cursor param pada request berikutnya
-- Has_more = false -> tidak ada data lagi
+- Implementasi server-side (catatan penting):
+  - Urutan (ordering) harus konsisten antar request. Pilih:
+    - Chronological (oldest first) atau reverse chronological (newest first). Pastikan client memahami urutan.
+  - Contoh query (Postgres, newest-first):
+    - Jika cursor kosong: SELECT * FROM conversations WHERE user_id = $1 ORDER BY id DESC LIMIT $limit
+    - Jika cursor diberikan (decoded_id): SELECT * FROM conversations WHERE user_id = $1 AND id < decoded_id ORDER BY id DESC LIMIT $limit
+    - Set next_cursor ke base64(id_terakhir_dari_halaman_ini) jika hasil penuh (jumlah == limit) dan masih mungkin ada data.
+  - Untuk messages (chronological oldest-first), gunakan condition id > decoded_id dan ORDER BY id ASC.
+  - Jangan gunakan OFFSET untuk dataset besar (kurang efisien). Cursor-based lebih stabil untuk list yang sering berubah.
+
+- Edge cases & tips:
+  - Jika item dihapus atau disisipkan di antara permintaan, cursor-based tetap lebih andal dibanding offset tapi bisa menyebabkan overlap/miss dalam skenario tertentu — pertimbangkan stable sort key (created_at + id).
+  - Sertakan limit maksimum di server (misal 100) untuk mencegah abuse.
+  - Jika ingin penjelasan lebih eksplisit di response, sertakan juga `first_item_id` atau `last_item_id` untuk debugging.
+
+Swagger / API Docs
+- Buka `/docs` untuk UI interaktif.
+- UI memuat spec dari `/swagger.json`.
+- Pastikan file `docs/swagger.json` ada di repository atau di-build pipeline untuk production.
+
+Catatan Tambahan
+- Semua endpoint yang membutuhkan otentikasi memakai middleware `auth:api`.
+- Jika ingin mengganti host/servers di Swagger, ubah `config/swagger.ts` -> `options.definition.servers`.
